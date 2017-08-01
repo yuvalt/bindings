@@ -305,7 +305,9 @@ struct HttpServer {
 
     static void listen(const FunctionCallbackInfo<Value> &args) {
         uWS::Group<uWS::SERVER> *group = (uWS::Group<uWS::SERVER> *) args.Holder()->GetAlignedPointerFromInternalField(0);
-        std::cout << "listen: " << hub.listen(args[0]->IntegerValue(), nullptr, 0, group) << std::endl;
+        int socketMode = (args[1]->IsBoolean() && args[1]->BooleanValue()) ? uS::ListenOptions::REUSE_PORT : 0;
+
+        std::cout << "listen: " << hub.listen(args[0]->IntegerValue(), nullptr, socketMode, group) << std::endl;
 
         if (args[args.Length() - 1]->IsFunction()) {
             Local<Function>::Cast(args[args.Length() - 1])->Call(args.GetIsolate()->GetCurrentContext()->Global(), 0, nullptr);
