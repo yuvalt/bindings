@@ -89,6 +89,13 @@ void deleteGroup(const FunctionCallbackInfo<Value> &args) {
 }
 
 template <bool isServer>
+void transferToGroup(const FunctionCallbackInfo<Value> &args) {
+    uWS::WebSocket<isServer> *ws = (uWS::WebSocket<isServer> *) args[0].As<External>()->Value();
+    uWS::Group<isServer> *group = (uWS::Group<isServer> *) args[1].As<External>()->Value();
+    ws->transfer(group);
+}
+
+template <bool isServer>
 inline Local<External> wrapSocket(uWS::WebSocket<isServer> *webSocket, Isolate *isolate) {
     return External::New(isolate, webSocket);
 }
@@ -436,6 +443,7 @@ struct Namespace {
         NODE_SET_METHOD(object, "prepareMessage", prepareMessage<isServer>);
         NODE_SET_METHOD(object, "sendPrepared", sendPrepared<isServer>);
         NODE_SET_METHOD(object, "finalizeMessage", finalizeMessage<isServer>);
+        NODE_SET_METHOD(object, "transfer", transferToGroup<isServer>);
 
         Local<Object> group = Object::New(isolate);
         NODE_SET_METHOD(group, "onConnection", onConnection<isServer>);
